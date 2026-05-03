@@ -1,4 +1,4 @@
-@startuml 
+@startuml
 title Интеграция (событийный поток)
 
 participant "Внутренняя система" as IS
