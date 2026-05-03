@@ -1,0 +1,27 @@
+@startuml
+title Интеграция (событийный поток)
+
+participant "Внутренняя система" as IS
+queue "RabbitMQ" as MQ
+participant "Интеграционный микросервис" as MS
+database "Файловое хранилище" as FS
+participant "Внешняя система" as ES
+
+== Возникновение события ==
+IS ->> MQ : async publish\n(event metadata + fileLink)
+
+== Обработка события ==
+MQ ->> MS : \nasync consume message
+
+== Получение XML ==
+MS -> FS : \nHTTP GET XML by link
+FS --> MS : \nHTTP 200\n(XML payload)
+
+== Преобразование ==
+MS -> MS : \nmapping XML\n(XSD 1 → XSD 2)
+
+== Отправка во внешнюю систему ==
+MS -> ES : \nHTTP POST /endpoint\n(JWT in body)
+
+ES --> MS : HTTP response\n(200/4xx/5xx)
+@enduml
